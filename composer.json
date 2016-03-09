@@ -1,0 +1,25 @@
+{
+    "name": "ulff/behat-rest-api-extension",
+    "type": "behat-extension",
+    "description": "Behat context for testing REST API calls",
+    "keywords": ["behat", "behat-extension", "php7", "behat context", "REST API"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Olaf Gałązka",
+            "email": "ulff.pl@gmail.com",
+            "homepage": "http://ulff.pl/"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "behat/behat": "3.1.*@dev",
+        "behat/mink": "dev-master",
+        "behat/mink-extension": "dev-master",
+        "behat/symfony2-extension": "dev-master",
+        "codifico/parameter-bag-extension": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "Ulff\\BehatRestApiExtension\\": "" }
+    }
+}
