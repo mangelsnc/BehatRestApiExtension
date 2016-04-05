@@ -99,6 +99,15 @@ Examples:
 @Then the response JSON should have "email" field with value "user@email.com"
 ```
 
+###### Then the response JSON should have :property field with value like :expectedValueRegexp
+Checks if response JSON object has a property with given name and value matching given regexp.
+
+Examples:
+```
+@Then the response JSON should have "error" field with value like "Missing param: [a-z]+"
+@Then the response JSON should have "zipcode" field with value like "[0-9]{2}-[0-9]{3}"
+```
+
 ###### Then the response JSON should have :property field set to :expectedValue
 Checks if response JSON object has a property with given name and that property has expected BOOLEAN value.
 
