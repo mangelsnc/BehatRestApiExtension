@@ -138,6 +138,21 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * Checks if response JSON object has a property with given name and value matching given regexp.
+     *
+     * Example: Then the response JSON should have "error" field with value like "Missing param: [a-z]+"
+     * Example: Then the response JSON should have "zipcode" field with value like "[0-9]{2}-[0-9]{3}"
+     *
+     * @Then the response JSON should have :property field with value like :expectedValueRegexp
+     */
+    public function theResponseJsonShouldHaveFieldWithValueLike($property, $expectedValueRegexp)
+    {
+        $response = $this->getResponseContentJson();
+        $this->assertDocumentHasPropertyWithValueLike($response, $property, $expectedValueRegexp);
+        return;
+    }
+
+    /**
      * Checks if response JSON object has a property with given name and that property has expected BOOLEAN value.
      *
      * Example: Then the response JSON should have "has_access" field set to "false"
@@ -410,6 +425,14 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         $this->assertDocumentHasProperty($document, $property);
         if($document->$property != $expectedValue) {
             throw new Exception\IncorrectPropertyValueException($property, $expectedValue, $document->$property);
+        }
+    }
+
+    private function assertDocumentHasPropertyWithValueLike($document, $property, $expectedValueRegexp)
+    {
+        $this->assertDocumentHasProperty($document, $property);
+        if(preg_match('/'.$expectedValueRegexp.'/', $document->$property) !== 1) {
+            throw new Exception\IncorrectPropertyValueException($property, $expectedValueRegexp, $document->$property);
         }
     }
 
