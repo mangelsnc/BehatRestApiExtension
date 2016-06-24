@@ -67,6 +67,14 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * @param array $headers
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+    }
+
+    /**
      * Checks if the response is a correct JSON.
      *
      * @Then the response should be JSON
@@ -114,7 +122,7 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
      *
      * @Then the response JSON should have :property field
      */
-    public function theRepsonseJsonShouldHaveField($property)
+    public function theResponseJsonShouldHaveField($property)
     {
         $response = $this->getResponseContentJson();
         $this->assertDocumentHasProperty($response, $property);
@@ -129,7 +137,7 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
      *
      * @Then the response JSON should have :property field with value :expectedValue
      */
-    public function theRepsonseJsonShouldHaveFieldWithValue($property, $expectedValue)
+    public function theResponseJsonShouldHaveFieldWithValue($property, $expectedValue)
     {
         $expectedValue = $this->extractFromParameterBag($expectedValue);
         $response = $this->getResponseContentJson();
@@ -160,7 +168,7 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
      *
      * @Then the response JSON should have :property field set to :expectedValue
      */
-    public function theRepsonseJsonShouldHaveFieldSetTo($property, $expectedValue)
+    public function theResponseJsonShouldHaveFieldSetTo($property, $expectedValue)
     {
         $response = $this->getResponseContentJson();
         $this->assertDocumentHasPropertyWithBooleanValue($response, $property, $expectedValue);
@@ -374,6 +382,22 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $response = $this->getResponseContentJson();
         $this->assertDocumentHasNestedPropertyWithValue($response, $nestedFieldName, $expectedValue);
+        return;
+    }
+
+    /**
+     * When response JSON is a collection (array), it checks the number of items in collection.
+     *
+     * Example: Then the response collection should count "4" items
+     *
+     * @Then the response collection should count :expectedValue items
+     */
+    public function theResponseCollectionShouldCountItems($expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        if ($expectedValue != count($response)) {
+            throw new Exception\CountCollectionException();
+        }
         return;
     }
 

@@ -226,3 +226,11 @@ Examples:
 ```
 @Then the response JSON should have nested "recipient->phone_number" field with value "123456789"
 ```
+
+###### Then the response collection should count :expectedValue items
+When response JSON is a collection (array), it checks the number of items in collection.
+
+Examples:
+```
+@Then the response collection should count "4" items
+```
