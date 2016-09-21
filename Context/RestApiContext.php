@@ -94,6 +94,20 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * Checks if a response JSON collection (array) is not empty.
+     *
+     * @Then the response JSON collection should not be empty
+     */
+    public function theResponseJsonCollectionShouldNotBeEmpty()
+    {
+        $response = $this->getResponseContentJson();
+        if(count($response) == 0) {
+            throw new Exception\EmptyCollectionException();
+        }
+        return;
+    }
+
+    /**
      * Checks if a response JSON is a single object, not a collection (array).
      *
      * @Then the response JSON should be a single object
