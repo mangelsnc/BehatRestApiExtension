@@ -13,7 +13,7 @@ and strictly check the response status codes and contents.
 Install extenstion using [composer](https://getcomposer.org):
 
 ```
-php composer.phar require "ulff/behat-rest-api-extension:dev-master"
+php composer.phar require "ulff/behat-rest-api-extension:^1.0"
 ```
 
 ### Step 2: load extension
@@ -78,6 +78,9 @@ Checks if the response is a correct JSON.
 
 ###### Then the response JSON should be a collection
 Checks if a response JSON is a collection (array).
+
+###### Then the response JSON collection should not be empty
+Checks if a response JSON collection (array) is not empty.
 
 ###### Then the response JSON should be a single object
 Checks if a response JSON is a single object, not a collection (array).
