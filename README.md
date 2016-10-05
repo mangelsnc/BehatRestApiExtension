@@ -82,6 +82,9 @@ Checks if a response JSON is a collection (array).
 ###### Then the response JSON collection should not be empty
 Checks if a response JSON collection (array) is not empty.
 
+###### Then the response JSON collection should be empty
+Checks if a response JSON collection (array) is empty.
+
 ###### Then the response JSON should be a single object
 Checks if a response JSON is a single object, not a collection (array).
 
