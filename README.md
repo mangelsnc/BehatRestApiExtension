@@ -105,6 +105,15 @@ Examples:
 @Then the response JSON should have "email" field with value "user@email.com"
 ```
 
+###### Then the response JSON should have :property field with exact value :expectedValue
+Checks if response JSON object has a property with given name and that property has expected exact value (including type).
+
+Examples:
+```
+@Then the response JSON should have "name" field with exact value "User name"
+@Then the response JSON should have "email" field with exact value "user@email.com"
+```
+
 ###### Then the response JSON should have :property field with value like :expectedValueRegexp
 Checks if response JSON object has a property with given name and value matching given regexp.
 
@@ -151,6 +160,16 @@ Examples:
 @Then all response collection items should have "color" field with value "red"
 ```
 
+###### Then all response collection items should have :property field with exact value :expectedValue
+When response JSON is a collection (array), it checks if ALL collection items have property with given name
+and that properties have expected exact value (including type).
+
+Examples:
+```
+@Then all response collection items should have "default" field with exact value "1"
+@Then all response collection items should have "color" field with exact value "red"
+```
+
 ###### Then all response collection items should have nested field :property with value :expectedValue
 When response JSON is a collection (array), it checks if ALL collection items have nested property with given
 path and that properties have expected value. For nesting property use "->" inside expected property name.
@@ -159,6 +178,16 @@ Examples:
 ```
 @Then all response collection items should have "owner->personal_data->name" field with value "John"
 @Then all response collection items should have "root->property" field with value "1"
+```
+
+###### Then all response collection items should have nested field :property with exact value :expectedValue
+When response JSON is a collection (array), it checks if ALL collection items have nested property with given
+path and that properties have expected exact value (including type). For nesting property use "->" inside expected property name.
+
+Examples:
+```
+@Then all response collection items should have "owner->personal_data->name" field with exact value "John"
+@Then all response collection items should have "root->property" field with exact value "1"
 ```
 
 ###### Then all response collection items should have :property field set to :expectedBoolean
@@ -213,10 +242,32 @@ Examples:
 @Then all nested "themes" collection items should have "font" field with value "Verdana"
 ```
 
+###### Then all nested :collectionFieldName collection items should have :nestedFieldName field with exact value :expectedValue
+When response JSON is a single object, it checks if that object has a property with given name, and that
+property is a collection (array), and all of that collection items have nested field with given path and with
+given exact value (including type).
+
+Examples:
+```
+@Then all nested "owners" collection items should have "user" field with exact value "John"
+@Then all nested "themes" collection items should have "font" field with exact value "Verdana"
+```
+
 ###### Then all nested :collectionFieldName collection items should have nested :nestedFieldName field with value :expectedValue
 When response JSON is a single object, it checks if that object has a property with given name, and that
 property is a collection (array), and all of that collection items have nested field with given path and
 given value. For nesting property use "->" inside expected property name.
+
+Examples:
+```
+@Then all nested "owners" collection items should have nested "user->name" field with value "John"
+@Then all nested "themes" collection items should have nested "font->color" field with value "Red"
+```
+
+###### Then all nested :collectionFieldName collection items should have nested :nestedFieldName field with exact value :expectedValue
+When response JSON is a single object, it checks if that object has a property with given name, and that
+property is a collection (array), and all of that collection items have nested field with given path and
+given exact value (including type). For nesting property use "->" inside expected property name.
 
 Examples:
 ```

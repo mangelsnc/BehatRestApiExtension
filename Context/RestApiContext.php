@@ -174,6 +174,23 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * Checks if response JSON object has a property with given name and that property has expected exact value
+     * (including type).
+     *
+     * Example: Then the response JSON should have "name" field with exact value "User name"
+     * Example: Then the response JSON should have "email" field with exact value "user@email.com"
+     *
+     * @Then the response JSON should have :property field with exact value :expectedValue
+     */
+    public function theRepsonseJsonShouldHaveFieldWithExactValue($property, $expectedValue)
+    {
+        $expectedValue = $this->extractFromParameterBag($expectedValue);
+        $response = $this->getResponseContentJson();
+        $this->assertDocumentHasPropertyWithExactValue($response, $property, $expectedValue);
+        return;
+    }
+
+    /**
      * Checks if response JSON object has a property with given name and value matching given regexp.
      *
      * Example: Then the response JSON should have "error" field with value like "Missing param: [a-z]+"
@@ -254,6 +271,24 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * When response JSON is a collection (array), it checks if ALL collection items have property with given name
+     * and that properties have expected exact value (including type).
+     *
+     * Example: Then all response collection items should have "default" field with exact value "1"
+     * Example: Then all response collection items should have "color" field with exact value "red"
+     *
+     * @Then all response collection items should have :property field with exact value :expectedValue
+     */
+    public function allResponseCollectionItemsShouldHaveFieldWithExactValue($property, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        foreach($response as $document) {
+            $this->assertDocumentHasPropertyWithExactValue($document, $property, $expectedValue);
+        }
+        return;
+    }
+
+    /**
      * When response JSON is a collection (array), it checks if ALL collection items have nested property with given
      * path and that properties have expected value. For nesting property use "->" inside expected property name.
      *
@@ -267,6 +302,24 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         $response = $this->getResponseContentJson();
         foreach($response as $document) {
             $this->assertDocumentHasNestedPropertyWithValue($document, $property, $expectedValue);
+        }
+        return;
+    }
+
+    /**
+     * When response JSON is a collection (array), it checks if ALL collection items have nested property with given
+     * path and that properties have expected exact value (including type). For nesting property use "->" inside expected property name.
+     *
+     * Example: Then all response collection items should have "owner->personal_data->name" field with exact value "John"
+     * Example: Then all response collection items should have "root->property" field with exact value "1"
+     *
+     * @Then all response collection items should have nested field :property with exact value :expectedValue
+     */
+    public function allResponseCollectionItemsShouldHaveNestedFieldWithExactValue($property, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        foreach($response as $document) {
+            $this->assertDocumentHasNestedPropertyWithExactValue($document, $property, $expectedValue);
         }
         return;
     }
@@ -378,6 +431,28 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * When response JSON is a single object, it checks if that object has a property with given name, and that
+     * property is a collection (array), and all of that collection items have nested field with given path and with
+     * given exact value (including type).
+     *
+     * Example: Then all nested "owners" collection items should have "user" field with exact value "John"
+     * Example: Then all nested "themes" collection items should have "font" field with exact value "Verdana"
+     *
+     * @Then all nested :collectionFieldName collection items should have :nestedFieldName field with exact value :expectedValue
+     */
+    public function allNestedCollectionItemsShouldHaveFieldWithExactValue($collectionFieldName, $nestedFieldName, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        if(empty($response->$collectionFieldName)) {
+            throw new Exception\EmptyCollectionException($collectionFieldName);
+        }
+        foreach($response->$collectionFieldName as $document) {
+            $this->assertDocumentHasPropertyWithExactValue($document, $nestedFieldName, $expectedValue);
+        }
+        return;
+    }
+
+    /**
+     * When response JSON is a single object, it checks if that object has a property with given name, and that
      * property is a collection (array), and all of that collection items have nested field with given path and
      * given value. For nesting property use "->" inside expected property name.
      *
@@ -394,6 +469,28 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         }
         foreach($response->$collectionFieldName as $document) {
             $this->assertDocumentHasNestedPropertyWithValue($document, $nestedFieldName, $expectedValue);
+        }
+        return;
+    }
+
+    /**
+     * When response JSON is a single object, it checks if that object has a property with given name, and that
+     * property is a collection (array), and all of that collection items have nested field with given path and
+     * given exact value (including type). For nesting property use "->" inside expected property name.
+     *
+     * Example: Then all nested "owners" collection items should have nested "user->name" field with exact value "John"
+     * Example: Then all nested "themes" collection items should have nested "font->color" field with exact value "Red"
+     *
+     * @Then all nested :collectionFieldName collection items should have nested :nestedFieldName field with exact value :expectedValue
+     */
+    public function allNestedCollectionItemsShouldHaveNestedFieldWithExactValue($collectionFieldName, $nestedFieldName, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        if(empty($response->$collectionFieldName)) {
+            throw new Exception\EmptyCollectionException($collectionFieldName);
+        }
+        foreach($response->$collectionFieldName as $document) {
+            $this->assertDocumentHasNestedPropertyWithExactValue($document, $nestedFieldName, $expectedValue);
         }
         return;
     }
@@ -429,14 +526,14 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         return;
     }
 
-    private function request($method, $uri, array $params = array(), array $headers = array())
+    protected function request($method, $uri, array $params = array(), array $headers = array())
     {
         $headers = array_merge($headers, $this->headers);
         $server = $this->createServerArray($headers);
         $this->getClient()->request($method, $this->locatePath($uri), $params, array(), $server);
     }
 
-    private function createServerArray(array $headers = array())
+    protected function createServerArray(array $headers = array())
     {
         $server = array();
         $nonPrefixed = array('CONTENT_TYPE');
@@ -448,31 +545,31 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         return $server;
     }
 
-    private function getClient()
+    protected function getClient()
     {
         $driver = $this->getSession()->getDriver();
         return $driver->getClient();
     }
 
-    private function extractFromParameterBag($string)
+    protected function extractFromParameterBag($string)
     {
         $string = $this->getParameterBag()->replace($string);
         return $string;
     }
 
-    private function getResponseContentJson()
+    protected function getResponseContentJson()
     {
         return json_decode($this->getClient()->getResponse()->getContent());
     }
 
-    private function assertDocumentHasProperty($document, $property)
+    protected function assertDocumentHasProperty($document, $property)
     {
         if(!isset($document->$property)) {
             throw new Exception\NotFoundPropertyException($property);
         }
     }
 
-    private function assertDocumentHasPropertyWithValue($document, $property, $expectedValue)
+    protected function assertDocumentHasPropertyWithValue($document, $property, $expectedValue)
     {
         $this->assertDocumentHasProperty($document, $property);
         if($document->$property != $expectedValue) {
@@ -480,7 +577,15 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         }
     }
 
-    private function assertDocumentHasPropertyWithValueLike($document, $property, $expectedValueRegexp)
+    protected function assertDocumentHasPropertyWithExactValue($document, $property, $expectedValue)
+    {
+        $this->assertDocumentHasProperty($document, $property);
+        if($document->$property !== $expectedValue) {
+            throw new Exception\IncorrectPropertyValueException($property, $expectedValue, $document->$property);
+        }
+    }
+
+    protected function assertDocumentHasPropertyWithValueLike($document, $property, $expectedValueRegexp)
     {
         $this->assertDocumentHasProperty($document, $property);
         if(preg_match('/'.$expectedValueRegexp.'/', $document->$property) !== 1) {
@@ -488,7 +593,25 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         }
     }
 
-    private function assertDocumentHasNestedPropertyWithValue($document, $property, $expectedValue)
+    protected function assertDocumentHasNestedPropertyWithValue($document, $property, $expectedValue)
+    {
+        $nestedNode = explode('->', $property);
+        $documentAsArray = (array) $document;
+        foreach($nestedNode as $node) {
+            if(!isset($documentAsArray[$node])) {
+                throw new Exception\NotFoundPropertyException($property);
+            }
+            $documentAsArray = (array) $documentAsArray[$node];
+        }
+        $documentAsArray = reset($documentAsArray);
+        $expectedValue = $this->extractFromParameterBag($expectedValue);
+
+        if($documentAsArray != $expectedValue) {
+            throw new Exception\IncorrectPropertyValueException($property, $expectedValue, $documentAsArray);
+        }
+    }
+
+    protected function assertDocumentHasNestedPropertyWithExactValue($document, $property, $expectedValue)
     {
         $nestedNode = explode('->', $property);
         $documentAsArray = (array) $document;
@@ -506,7 +629,7 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         }
     }
 
-    private function assertDocumentHasPropertyWithBooleanValue($document, $property, $expectedValue)
+    protected function assertDocumentHasPropertyWithBooleanValue($document, $property, $expectedValue)
     {
         $expectedBoolean = ($expectedValue == 'true' ? true : false);
         $this->assertDocumentHasProperty($document, $property);
@@ -515,7 +638,7 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         }
     }
 
-    private function assertDocumentHasPropertyWithArrayAsValue($document, $property, $expectedValue)
+    protected function assertDocumentHasPropertyWithArrayAsValue($document, $property, $expectedValue)
     {
         $this->assertDocumentHasProperty($document, $property);
         $anArray = [];
