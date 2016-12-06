@@ -526,6 +526,30 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         return;
     }
 
+    /**
+     * When response JSON is a collection (array), it checks if any collection item has field with given value.
+     *
+     * Example: Then at least one of the collection items should have field "name" with value "abcdef"
+     *
+     * @Then at least one of the collection items should have field :fieldName with value :expectedValue
+     */
+    public function atLeastOneOfTheCollectionItemsShouldHaveFieldWithValue($fieldName, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+
+        $counter = 0;
+        foreach ($response as $item) {
+            if ($item->$fieldName == $expectedValue) {
+                $counter++;
+            }
+        }
+
+        if ($counter == 0) {
+            throw new Exception\NotFoundPropertyException($fieldName);
+        }
+        return;
+    }
+
     protected function request($method, $uri, array $params = array(), array $headers = array())
     {
         $headers = array_merge($headers, $this->headers);
