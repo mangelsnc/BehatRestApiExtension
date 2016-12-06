@@ -291,3 +291,11 @@ Examples:
 ```
 @Then the response collection should count "4" items
 ```
+
+###### Then at least one of the collection items should have field :fieldName with value :expectedValue
+When response JSON is a collection (array), it checks if any collection item has field with given value.
+
+Examples:
+```
+Then at least one of the collection items should have field "name" with value "abcdef"
+```
