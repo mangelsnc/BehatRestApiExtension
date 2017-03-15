@@ -55,7 +55,9 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         $uri = $this->extractFromParameterBag($uri);
         $params = [];
         foreach($table->getRowsHash() as $field => $value) {
-            if(preg_match('/array\(.*\)/', $value)) {
+            if (preg_match_all('/(.*)\[(.*)\]/i', $field, $matches, PREG_SET_ORDER)) {
+                $params[$matches[0][1]][$matches[0][2]] = $value;
+            } elseif(preg_match('/array\(.*\)/', $value)) {
                 $anArray = [];
                 eval("\$anArray = $value;");
                 $params[$field] = $anArray;
