@@ -4,6 +4,7 @@ namespace Ulff\BehatRestApiExtension\Context;
 
 use Ulff\BehatRestApiExtension\Exception as Exception;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Gherkin\Node\PyStringNode;
 use Codifico\ParameterBagExtension\Context\ParameterBagDictionary;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Behat\MinkExtension\Context\MinkContext;
@@ -55,7 +56,9 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
         $uri = $this->extractFromParameterBag($uri);
         $params = [];
         foreach($table->getRowsHash() as $field => $value) {
-            if(preg_match('/array\(.*\)/', $value)) {
+            if (preg_match_all('/(.*)\[(.*)\]/i', $field, $matches, PREG_SET_ORDER)) {
+                $params[$matches[0][1]][$matches[0][2]] = $value;
+            } elseif(preg_match('/array\(.*\)/', $value)) {
                 $anArray = [];
                 eval("\$anArray = $value;");
                 $params[$field] = $anArray;
@@ -64,6 +67,48 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
             }
         }
         $this->request($method, $uri, $params);
+    }
+
+    /**
+     * Make request specifying http method and uri and parameters as JSON.
+     *
+     * Example:
+     *  When I make request "POST" "/api/v1/posts" with following JSON content:
+     *  """
+     *  {
+     *      "user": "user-id",
+     *      "title": "Some title"
+     *      "number": 12
+     *  }
+     *  """
+     *
+     * Example:
+     *  When I make request "PUT" "/api/v1/users/{id}" with following JSON content:
+     *  """
+     *  {
+     *      "education": [
+     *          {
+     *              "school": "A primary school",
+     *              "address": "Some Street 10, SomeCity"
+     *          },
+     *          {
+     *              "school": "High School",
+     *              "address": "Another Street 1, SomeCity"
+     *          }
+     *      ],
+     *      "workplace": {
+     *          "name": "A company",
+     *          "phone": "+48 111 222 333"
+     *      }
+     *  }
+     *  """
+     *
+     * @When I make request :method :uri with following JSON content:
+     */
+    public function iMakeRequestWithFollowingJSONContent($method, $uri, PyStringNode $json)
+    {
+        $uri = $this->extractFromParameterBag($uri);
+        $this->request($method, $uri, json_decode($json, true));
     }
 
     /**

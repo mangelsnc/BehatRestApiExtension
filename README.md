@@ -57,6 +57,42 @@ Examples:
 @When I make request "HEAD" "/api/v1/presentations/{id}"
 ```
 
+
+###### When I make request :method :uri with following JSON content:
+Make request specifying http method and uri and parameters as JSON.
+
+Examples:
+```
+@When I make request "POST" "/api/v1/posts" with following JSON content:
+"""
+{
+    "user": "user-id",
+    "title": "Some title"
+    "number": 12
+}
+"""
+
+@When I make request "PUT" "/api/v1/users/{id}" with following JSON content:
+"""
+{
+    "education": [
+        {
+            "school": "A primary school",
+            "address": "Some Street 10, SomeCity"
+        },
+        {
+            "school": "High School",
+            "address": "Another Street 1, SomeCity"
+        }
+    ],
+    "workplace": {
+        "name": "A company",
+        "phone": "+48 111 222 333"
+    }
+}
+"""
+```
+
 ###### When I make request :method :uri with params:
 Make request specifying http method and uri and parameters as TableNode.
 TableNode values can be also ParameterBag params.
