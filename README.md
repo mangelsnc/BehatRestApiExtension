@@ -311,6 +311,29 @@ Examples:
 @Then all nested "themes" collection items should have nested "font->color" field with value "Red"
 ```
 
+###### Then exactly one nested :collectionFieldName collection items should have :nestedFieldName field with value :expectedValue
+When response JSON is a single object, it checks if that object has a property with given name, and that
+property is a collection (array), and exactly one of that collection items have nested field with given path and with
+given value.
+
+Examples:
+```
+@Then exactly one nested "users" collection items should have "login" field with value "johny63"
+@Then exactly one nested "members" collection items should have "position" field with value "leader"
+```
+
+###### Then at least one nested :collectionFieldName collection items should have :nestedFieldName field with value :expectedValue
+When response JSON is a single object, it checks if that object has a property with given name, and that
+property is a collection (array), and at least one of that collection items have nested field with given path and with
+given value.
+
+Examples:
+```
+@Then at least one nested "users" collection items should have "firstname" field with value "John"
+@Then at least one nested "members" collection items should have "position" field with value "worker"
+```
+
+
 ###### Then the response JSON should have nested :nestedFieldName field with value :expectedValue
 When response JSON is a single object, it checks if that object has a property with given path and given value.
 For nesting property use "->" inside expected property name.

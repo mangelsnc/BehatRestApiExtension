@@ -498,6 +498,63 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
 
     /**
      * When response JSON is a single object, it checks if that object has a property with given name, and that
+     * property is a collection (array), and exactly one of that collection items have nested field with given path and with
+     * given value.
+     *
+     * Example: Then exactly one nested "users" collection items should have "login" field with value "johny63"
+     * Example: Then exactly one nested "members" collection items should have "position" field with value "leader"
+     *
+     * @Then exactly one nested :collectionFieldName collection items should have :nestedFieldName field with value :expectedValue
+     */
+    public function exactlyOneNestedCollectionItemsShouldHaveFieldWithValue($collectionFieldName, $nestedFieldName, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        if(empty($response->$collectionFieldName)) {
+            throw new Exception\EmptyCollectionException($collectionFieldName);
+        }
+
+        $occurrences = 0;
+        foreach($response->$collectionFieldName as $document) {
+            $this->assertDocumentHasProperty($document, $nestedFieldName);
+            if($document->$nestedFieldName == $expectedValue) {
+                $occurrences++;
+            }
+        }
+
+        if ($occurrences != 1) {
+            throw new Exception\DocumentValidationException('Expected exactly one occurence, got: '.$occurrences);
+        }
+    }
+
+    /**
+     * When response JSON is a single object, it checks if that object has a property with given name, and that
+     * property is a collection (array), and exactly one of that collection items have nested field with given path and with
+     * given value.
+     *
+     * Example: Then at least one nested "users" collection items should have "firstname" field with value "John"
+     * Example: Then at least one nested "members" collection items should have "position" field with value "worker"
+     *
+     * @Then at least one nested :collectionFieldName collection items should have :nestedFieldName field with value :expectedValue
+     */
+    public function atLeastOneNestedCollectionItemsShouldHaveFieldWithValue($collectionFieldName, $nestedFieldName, $expectedValue)
+    {
+        $response = $this->getResponseContentJson();
+        if(empty($response->$collectionFieldName)) {
+            throw new Exception\EmptyCollectionException($collectionFieldName);
+        }
+
+        foreach($response->$collectionFieldName as $document) {
+            $this->assertDocumentHasProperty($document, $nestedFieldName);
+            if($document->$nestedFieldName == $expectedValue) {
+                return;
+            }
+        }
+
+        throw new Exception\DocumentValidationException('Expected at least one occurrence, none got!');
+    }
+
+    /**
+     * When response JSON is a single object, it checks if that object has a property with given name, and that
      * property is a collection (array), and all of that collection items have nested field with given path and
      * given value. For nesting property use "->" inside expected property name.
      *
@@ -653,6 +710,22 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
 
         if($documentAsArray != $expectedValue) {
             throw new Exception\IncorrectPropertyValueException($property, $expectedValue, $documentAsArray);
+        }
+    }
+
+    protected function assertDocumentHasNestedPropertyWithNullValue($document, $property)
+    {
+        $nestedNode = explode('->', $property);
+        $documentAsArray = (array) $document;
+        foreach($nestedNode as $node) {
+            if(!array_key_exists($node, $documentAsArray)) {
+                throw new Exception\NotFoundPropertyException($property);
+            }
+            $documentAsArray = (array) $documentAsArray[$node];
+        }
+
+        if(!empty($documentAsArray)) {
+            throw new Exception\DocumentValidationException('Expected null, got some value');
         }
     }
 
