@@ -219,6 +219,21 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * Checks if response JSON object has a property with given name and that property has null value.
+     *
+     * Example: Then the response JSON should have "end_date" field with null value
+     * Example: Then the response JSON should have "participants" field with null value
+     *
+     * @Then the response JSON should have :property field with null value
+     */
+    public function theResponseJsonShouldHaveFieldWithNullValue($property)
+    {
+        $response = $this->getResponseContentJson();
+        $this->assertDocumentHasNestedPropertyWithNullValue($response, $property);
+        return;
+    }
+
+    /**
      * Checks if response JSON object has a property with given name and that property has expected exact value
      * (including type).
      *
