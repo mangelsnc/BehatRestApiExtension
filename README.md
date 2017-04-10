@@ -141,6 +141,15 @@ Examples:
 @Then the response JSON should have "email" field with value "user@email.com"
 ```
 
+###### Then the response JSON should have :property field with null value
+Checks if response JSON object has a property with given name and that property has null value.
+
+Examples:
+```
+@Then the response JSON should have "end_date" field with null value"
+@Then the response JSON should have "participants" field with null value
+```
+
 ###### Then the response JSON should have :property field with exact value :expectedValue
 Checks if response JSON object has a property with given name and that property has expected exact value (including type).
 
