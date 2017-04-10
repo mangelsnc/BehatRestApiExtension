@@ -352,6 +352,15 @@ Examples:
 @Then the response JSON should have nested "recipient->phone_number" field with value "123456789"
 ```
 
+###### Then the response JSON should have nested :nestedFieldName field with null value
+When response JSON is a single object, it checks if that object has a property with given path with null value.
+For nesting property use "->" inside expected property name.
+
+Examples:
+```
+@Then the response JSON should have nested "forever_alone->friends" field with null value
+```
+
 ###### Then the response collection should count :expectedValue items
 When response JSON is a collection (array), it checks the number of items in collection.
 

@@ -628,6 +628,21 @@ class RestApiContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * When response JSON is a single object, it checks if that object has a property with given path with null value.
+     * For nesting property use "->" inside expected property name.
+     *
+     * Example: Then the response JSON should have nested "forever_alone->friends" field with null value
+     *
+     * @Then the response JSON should have nested :nestedFieldName field with null value
+     */
+    public function theResponseJsonShouldHaveNestedFieldWithNullValue($nestedFieldName)
+    {
+        $response = $this->getResponseContentJson();
+        $this->assertDocumentHasNestedPropertyWithNullValue($response, $nestedFieldName);
+        return;
+    }
+
+    /**
      * When response JSON is a collection (array), it checks the number of items in collection.
      *
      * Example: Then the response collection should count "4" items
